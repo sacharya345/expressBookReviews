@@ -38,7 +38,7 @@ public_users.get('/isbn/:isbn', (req, res) => {
 });
 
 // -------------------------
-// GET BOOKS BY AUTHOR (TASK 3 - REQUIRED)
+// GET BOOKS BY AUTHOR (async/await)
 // -------------------------
 public_users.get('/author/:author', async (req, res) => {
   try {
@@ -53,30 +53,31 @@ public_users.get('/author/:author', async (req, res) => {
     });
 
     return res.status(200).json(result);
-  } catch (err) {
-    return res.status(500).json({ message: "Error fetching books by author" });
+  } catch {
+    return res.status(500).json({ message: "Error fetching author books" });
   }
 });
 
 // -------------------------
-// GET BOOKS BY TITLE
+// ✅ TASK 4: GET BOOKS BY TITLE (AXIOS REQUIRED)
 // -------------------------
-public_users.get('/title/:title', async (req, res) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/`);
-    const books = response.data;
+public_users.get('/title/:title', (req, res) => {
+  axios.get(`${BASE_URL}/`)
+    .then(response => {
+      const books = response.data;
 
-    let result = {};
-    Object.keys(books).forEach(isbn => {
-      if (books[isbn].title === req.params.title) {
-        result[isbn] = books[isbn];
-      }
+      let result = {};
+      Object.keys(books).forEach(isbn => {
+        if (books[isbn].title === req.params.title) {
+          result[isbn] = books[isbn];
+        }
+      });
+
+      return res.status(200).json(result);
+    })
+    .catch(() => {
+      return res.status(500).json({ message: "Error fetching books by title" });
     });
-
-    return res.status(200).json(result);
-  } catch (err) {
-    return res.status(500).json({ message: "Error fetching books by title" });
-  }
 });
 
 // -------------------------
@@ -94,7 +95,7 @@ public_users.get('/review/:isbn', async (req, res) => {
     }
 
     return res.status(200).json(book.reviews);
-  } catch (err) {
+  } catch {
     return res.status(500).json({ message: "Error fetching reviews" });
   }
 });
